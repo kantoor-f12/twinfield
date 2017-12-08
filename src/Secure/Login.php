@@ -94,6 +94,9 @@ class Login
     {
         $this->config = $config;
         $this->office = $config->getOffice();
+
+        var_dump($this->office);
+
         $this->organisation = $config->getOrganisation();
         $this->cluster = !is_null($config->cluster) ? $config->cluster : $this->cluster;
 
