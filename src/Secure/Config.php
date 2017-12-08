@@ -54,6 +54,26 @@ final class Config
         'clientSecret' => ''
     );
 
+    /**
+     * Holds all the Credentials for OpenID login with a given refresh/accessToken for this
+     * config object
+     *
+     * @access private
+     * @var array
+     */
+    private $openIdDirectConnectCredentials = array(
+        'clientToken' => '',
+        'clientSecret' => '',
+        'refreshToken' => '',
+        'accessToken' => ''
+    );
+
+    /**
+     * Determines whether to use the built in login functionality or our own
+     *
+     * @var bool
+     */
+    private $legacyMode = true;
 
     /**
      * Holds all the OAuth class
@@ -91,6 +111,23 @@ final class Config
         $this->oauthCredentials['autoRedirect'] = $autoRedirect;
         $this->oauthCredentials['clearSession'] = $clearSession;
         $this->setOrganisationAndOffice($org, $office);
+    }
+
+    public function setOpenIdDirectConnectCredentials($clientToken, $clientSecret, $refreshToken, $accessToken) {
+        $this->openIdDirectConnectCredentials['clientToken'] = $clientToken;
+        $this->openIdDirectConnectCredentials['clientSecret'] = $clientSecret;
+        $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
+        $this->openIdDirectConnectCredentials['accessToken'] = $accessToken;
+
+        $this->legacyMode = false;
+    }
+
+    public function getOpenIdDirectConnectCredentials() {
+        return $this->openIdDirectConnectCredentials;
+    }
+
+    public function setRefreshToken($refreshToken) {
+        $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
     }
 
     /**
@@ -259,6 +296,11 @@ final class Config
     public function getSoapClientOptions()
     {
         return $this->soapClientOptions;
+    }
+
+
+    public function isLegacyMode() {
+        return $this->legacyMode;
     }
 
     /**

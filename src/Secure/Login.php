@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpTwinfield\Secure;
 
 use PhpTwinfield\Exception;
@@ -16,24 +17,24 @@ use Webmozart\Assert\Assert;
  * The username, password and organisation are retrieved from the options
  * on construct.
  *
- * @uses \PhpTwinfield\Secure\Config    Holds all the config settings for this account
- * @uses \SoapClient                          For both login and future interactions
- * @uses \SoapHeader                          Generation of the secure header
- * @uses \DOMDocument                         Handles the response from login
+ * @uses          \PhpTwinfield\Secure\Config    Holds all the config settings for this account
+ * @uses          \SoapClient                          For both login and future interactions
+ * @uses          \SoapHeader                          Generation of the secure header
+ * @uses          \DOMDocument                         Handles the response from login
  *
- * @since 0.0.1
+ * @since         0.0.1
  *
- * @package PhpTwinfield
- * @subpackage Secure
- * @author Leon Rowland <leon@rowland.nl>
+ * @package       PhpTwinfield
+ * @subpackage    Secure
+ * @author        Leon Rowland <leon@rowland.nl>
  * @copyright (c) 2013, Leon Rowland
- * @version 0.0.1
+ * @version       0.0.1
  */
 class Login
 {
     /**
      * Holds the passed in Config instance
-     * 
+     *
      * @access private
      * @var \PhpTwinfield\Secure\Config
      */
@@ -68,7 +69,10 @@ class Login
     {
         $this->config = $config;
         $this->cluster = !is_null($config->cluster) ? $config->cluster : $this->cluster;
-        $this->loginService = new LoginService(null, $config->getSoapClientOptions());
+        $this->loginService = new LoginService(
+            null,
+            $config->getSoapClientOptions()
+        );
     }
 
     /**
@@ -76,11 +80,15 @@ class Login
      */
     protected function login()
     {
-        if ($this->sessionID) {
-            return;
-        }
+        if ($this->config->isLegacyMode()) {
+            if ($this->sessionID) {
+                return;
+            }
 
-        [$this->sessionID, $this->cluster] = $this->loginService->getSessionIdAndCluster($this->config);
+            [$this->sessionID, $this->cluster] = $this->loginService->getSessionIdAndCluster($this->config);
+        } else {
+            $this->loginService->getRefreshAndAccessToken($this->config);
+        }
     }
 
     /**
@@ -92,6 +100,7 @@ class Login
      * Get an authenticated client for a specific service/
      *
      * @param Services $service
+     *
      * @throws Exception
      * @return BaseService
      */
@@ -101,7 +110,10 @@ class Login
 
         $key = $service->getKey();
 
-        if (!array_key_exists($key, $this->authenticatedClients)) {
+        if (!array_key_exists(
+            $key,
+            $this->authenticatedClients
+        )) {
 
             $classname = $service->getValue();
 
@@ -110,11 +122,13 @@ class Login
                 $this->config->getSoapClientOptions() + ["cluster" => $this->cluster]
             );
 
-            $this->authenticatedClients[$key]->__setSoapHeaders(new \SoapHeader(
-                'http://www.twinfield.com/',
-                'Header',
-                array('SessionID' => $this->sessionID)
-            ));
+            $this->authenticatedClients[$key]->__setSoapHeaders(
+                new \SoapHeader(
+                    'http://www.twinfield.com/',
+                    'Header',
+                    ['SessionID' => $this->sessionID]
+                )
+            );
         }
 
         return $this->authenticatedClients[$key];
