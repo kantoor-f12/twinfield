@@ -87,10 +87,16 @@ class Login
      */
     private $cluster = 'https://c3.twinfield.com';
 
+    private $office;
+    private $organisation;
+
     public function __construct(Config $config)
     {
         $this->config = $config;
+        $this->office = $config->getOffice();
+        $this->organisation = $config->getOrganisation();
         $this->cluster = !is_null($config->cluster) ? $config->cluster : $this->cluster;
+
         $this->loginService = new LoginService(
             null,
             $config->getSoapClientOptions()
@@ -110,7 +116,7 @@ class Login
             [$this->sessionID, $this->cluster] = $this->loginService->getSessionIdAndCluster($this->config);
         }else {
             // If accessToken is still valid, don't try to retrieve it.
-            if($this->expire && time() <= $this->expire) {
+            if ($this->expire && time() <= $this->expire) {
                 return;
             }
 
@@ -159,16 +165,18 @@ class Login
                         ['SessionID' => $this->sessionID]
                     )
                 );
-            } else {
+            }else {
                 $this->authenticatedClients[$key]->__setSoapHeaders(
                     new \SoapHeader(
                         'http://www.twinfield.com/',
                         'Header',
-                        ['AccessToken' => $this->accessToken]
+                        [
+                            'AccessToken' => $this->accessToken,
+                            'CompanyCode' => $this->office,
+                        ]
                     )
                 );
             }
-
         }
 
         return $this->authenticatedClients[$key];

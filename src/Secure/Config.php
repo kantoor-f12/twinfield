@@ -113,12 +113,14 @@ final class Config
         $this->setOrganisationAndOffice($org, $office);
     }
 
-    public function setOpenIdDirectConnectCredentials($clientId, $clientSecret, $refreshToken, $accessToken) {
+    public function setOpenIdDirectConnectCredentials($clientId, $clientSecret, $refreshToken, $accessToken, $organisation, $office) {
         $this->openIdDirectConnectCredentials['clientId'] = $clientId;
         $this->openIdDirectConnectCredentials['clientSecret'] = $clientSecret;
         $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
         $this->openIdDirectConnectCredentials['accessToken'] = $accessToken;
+        $this->setOrganisationAndOffice($organisation, $office);
 
+        // Use our own login implementation instead of the deprecated built-in session sign-on and oauth1.
         $this->legacyMode = false;
     }
 
