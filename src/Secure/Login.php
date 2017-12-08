@@ -166,13 +166,15 @@ class Login
                     )
                 );
             }else {
+                var_dump($this->office);
+
                 $this->authenticatedClients[$key]->__setSoapHeaders(
                     new \SoapHeader(
                         'http://www.twinfield.com/',
                         'Header',
                         [
-                            'AccessToken' => $this->accessToken,
                             'CompanyCode' => $this->office,
+                            'AccessToken' => $this->accessToken,
                         ]
                     )
                 );
