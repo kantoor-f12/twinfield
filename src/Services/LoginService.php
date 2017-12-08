@@ -93,8 +93,7 @@ class LoginService extends BaseService
         return [$refreshToken, $accessToken];
     }
 
-    public function getClusterAndExpire(Config $config, string $accessToken): array {
-
+    public function getClusterAndExpire(string $accessToken): array {
         $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation";
 
         // Setup cURL

@@ -109,13 +109,14 @@ class Login
 
             [$this->sessionID, $this->cluster] = $this->loginService->getSessionIdAndCluster($this->config);
         }else {
-            // Retrieve refresh/acccessToken
-            [$this->refreshToken, $this->accessToken] = $this->loginService->getRefreshAndAccessToken($this->config);
+            // If accessToken is still valid, don't try to retrieve it.
+            if($this->expire && time() <= $this->expire) {
+                return;
+            }
 
-            [$this->cluster, $this->expire] = $this->loginService->getClusterAndExpire(
-                $this->config,
-                $this->accessToken
-            );
+            // Retrieve refresh, accessToken, cluster and expiry timestamp.
+            [$this->refreshToken, $this->accessToken] = $this->loginService->getRefreshAndAccessToken($this->config);
+            [$this->cluster, $this->expire] = $this->loginService->getClusterAndExpire($this->accessToken);
         }
     }
 
@@ -150,13 +151,24 @@ class Login
                 $this->config->getSoapClientOptions() + ["cluster" => $this->cluster]
             );
 
-            $this->authenticatedClients[$key]->__setSoapHeaders(
-                new \SoapHeader(
-                    'http://www.twinfield.com/',
-                    'Header',
-                    ['SessionID' => $this->sessionID]
-                )
-            );
+            if ($this->config->isLegacyMode()) {
+                $this->authenticatedClients[$key]->__setSoapHeaders(
+                    new \SoapHeader(
+                        'http://www.twinfield.com/',
+                        'Header',
+                        ['SessionID' => $this->sessionID]
+                    )
+                );
+            } else {
+                $this->authenticatedClients[$key]->__setSoapHeaders(
+                    new \SoapHeader(
+                        'http://www.twinfield.com/',
+                        'Header',
+                        ['AccessToken' => $this->accessToken]
+                    )
+                );
+            }
+
         }
 
         return $this->authenticatedClients[$key];
