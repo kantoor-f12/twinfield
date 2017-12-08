@@ -117,7 +117,6 @@ class LoginService extends BaseService
 
         // Decode the response
         $responseData = json_decode($response, TRUE);
-        var_dump($responseData);
 
         $cluster = $responseData['twf.clusterUrl'];
         $expire = $responseData['exp'];
