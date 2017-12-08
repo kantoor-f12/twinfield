@@ -56,6 +56,28 @@ class Login
      */
     private $sessionID;
 
+
+    /**
+     * The refreshToken for openID login
+     *
+     * @var string
+     */
+    private $refreshToken;
+
+    /**
+     * The accessToken for openID login
+     *
+     * @var string
+     */
+    private $accessToken;
+
+    /**
+     * The expiry timestamp for the openID accessToken
+     *
+     * @var string
+     */
+    private $expire;
+
     /**
      * The server cluster used for future XML
      * requests with the new SoapClient
@@ -86,8 +108,14 @@ class Login
             }
 
             [$this->sessionID, $this->cluster] = $this->loginService->getSessionIdAndCluster($this->config);
-        } else {
-            $this->loginService->getRefreshAndAccessToken($this->config);
+        }else {
+            // Retrieve refresh/acccessToken
+            [$this->refreshToken, $this->accessToken] = $this->loginService->getRefreshAndAccessToken($this->config);
+
+            [$this->cluster, $this->expire] = $this->loginService->getClusterAndExpire(
+                $this->config,
+                $this->accessToken
+            );
         }
     }
 

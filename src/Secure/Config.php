@@ -65,7 +65,7 @@ final class Config
         'clientId' => '',
         'clientSecret' => '',
         'refreshToken' => '',
-        'accessToken' => ''
+        'accessToken' => '',
     );
 
     /**
@@ -124,10 +124,6 @@ final class Config
 
     public function getOpenIdDirectConnectCredentials() {
         return $this->openIdDirectConnectCredentials;
-    }
-
-    public function setRefreshToken($refreshToken) {
-        $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
     }
 
     /**

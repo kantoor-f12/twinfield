@@ -87,9 +87,42 @@ class LoginService extends BaseService
 
         // Decode the response
         $responseData = json_decode($response, TRUE);
+        $refreshToken = $responseData['refresh_token'];
+        $accessToken = $responseData['access_token'];
+
+        return [$refreshToken, $accessToken];
+    }
+
+    public function getClusterAndExpire(Config $config, string $accessToken): array {
+
+        $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation";
+
+        // Setup cURL
+        $ch = curl_init("$url?token=$accessToken");
+        curl_setopt_array($ch, array(
+            CURLOPT_POST => FALSE,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_HTTPHEADER => array(
+                'host: login.twinfield.com'
+            )
+        ));
+
+        // Send the request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if($response === FALSE){
+            die(curl_error($ch));
+        }
+
+        // Decode the response
+        $responseData = json_decode($response, TRUE);
         var_dump($responseData);
 
-        return [$configRefreshToken, $accessToken];
+        $cluster = $responseData['twf.clusterUrl'];
+        $expire = $responseData['exp'];
+
+        return [$cluster, $expire];
     }
 
     protected function WSDL(): string
