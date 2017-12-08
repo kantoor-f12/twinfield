@@ -59,7 +59,7 @@ class LoginService extends BaseService
     {
         $configClientId = $config->getOpenIdDirectConnectCredentials()['clientId'];
         $configClientSecret = $config->getOpenIdDirectConnectCredentials()['clientSecret'];
-        $configRefreshToken = $config->getOpenIdDirectConnectCredentials()['refreshToken'];;
+        $configRefreshToken = $config->getOpenIdDirectConnectCredentials()['refreshToken'];
 
         $url = 'https://login.twinfield.com/auth/authentication/connect/token';
         $authString = base64_encode("$configClientId:$configClientSecret");
@@ -70,7 +70,7 @@ class LoginService extends BaseService
             CURLOPT_POST => TRUE,
             CURLOPT_RETURNTRANSFER => TRUE,
             CURLOPT_HTTPHEADER => array(
-                "Authorization: $authString",
+                "Authorization: Basic $authString",
                 'Content-Type: application/x-www-form-urlencoded',
                 'host: login.twinfield.com'
             ),

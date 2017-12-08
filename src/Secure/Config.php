@@ -62,7 +62,7 @@ final class Config
      * @var array
      */
     private $openIdDirectConnectCredentials = array(
-        'clientToken' => '',
+        'clientId' => '',
         'clientSecret' => '',
         'refreshToken' => '',
         'accessToken' => ''
@@ -113,8 +113,8 @@ final class Config
         $this->setOrganisationAndOffice($org, $office);
     }
 
-    public function setOpenIdDirectConnectCredentials($clientToken, $clientSecret, $refreshToken, $accessToken) {
-        $this->openIdDirectConnectCredentials['clientToken'] = $clientToken;
+    public function setOpenIdDirectConnectCredentials($clientId, $clientSecret, $refreshToken, $accessToken) {
+        $this->openIdDirectConnectCredentials['clientId'] = $clientId;
         $this->openIdDirectConnectCredentials['clientSecret'] = $clientSecret;
         $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
         $this->openIdDirectConnectCredentials['accessToken'] = $accessToken;
