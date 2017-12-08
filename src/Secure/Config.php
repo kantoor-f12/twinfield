@@ -118,10 +118,6 @@ final class Config
         $this->openIdDirectConnectCredentials['clientSecret'] = $clientSecret;
         $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
         $this->openIdDirectConnectCredentials['accessToken'] = $accessToken;
-
-        var_dump("1");
-        var_dump($office);
-
         $this->setOrganisationAndOffice($organisation, $office);
 
         // Use our own login implementation instead of the deprecated built-in session sign-on and oauth1.
@@ -253,9 +249,6 @@ final class Config
      */
     public function getOffice()
     {
-        var_dump("2");
-        var_dump($this->credentials['office']);
-
         return $this->credentials['office'];
     }
 
