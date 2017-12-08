@@ -118,6 +118,8 @@ final class Config
         $this->openIdDirectConnectCredentials['clientSecret'] = $clientSecret;
         $this->openIdDirectConnectCredentials['refreshToken'] = $refreshToken;
         $this->openIdDirectConnectCredentials['accessToken'] = $accessToken;
+
+        var_dump("1");
         var_dump($office);
 
         $this->setOrganisationAndOffice($organisation, $office);
@@ -251,8 +253,8 @@ final class Config
      */
     public function getOffice()
     {
+        var_dump("2");
         var_dump($this->credentials['office']);
-
 
         return $this->credentials['office'];
     }

@@ -95,6 +95,7 @@ class Login
         $this->config = $config;
         $this->office = $config->getOffice();
 
+        var_dump("3");
         var_dump($this->office);
 
         $this->organisation = $config->getOrganisation();
@@ -169,6 +170,7 @@ class Login
                     )
                 );
             }else {
+                var_dump("4");
                 var_dump($this->office);
 
                 $this->authenticatedClients[$key]->__setSoapHeaders(
