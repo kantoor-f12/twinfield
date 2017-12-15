@@ -119,7 +119,7 @@ class LoginService extends BaseService
         $responseData = json_decode($response, TRUE);
 
         if (!array_key_exists("twf.clusterUrl", $responseData) || !array_key_exists("exp", $responseData)) {
-            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield", 1, $responseData);
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield: $responseData");
         }
 
         $cluster = $responseData['twf.clusterUrl'];
