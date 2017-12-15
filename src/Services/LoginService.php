@@ -95,7 +95,7 @@ class LoginService extends BaseService
     }
 
     public function getClusterAndExpire(string $accessToken): array {
-        $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidationzzz";
+        $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation";
 
         // Setup cURL
         $ch = curl_init("$url?token=$accessToken");
