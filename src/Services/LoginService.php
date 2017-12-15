@@ -2,6 +2,7 @@
 
 namespace PhpTwinfield\Services;
 
+use Exception\AuthenticationException;
 use PhpTwinfield\Exception;
 use PhpTwinfield\Secure\Config;
 
@@ -107,11 +108,13 @@ class LoginService extends BaseService
         ));
 
         // Send the request
-        $response = curl_exec($ch);
+//        $response = curl_exec($ch);
+        $response = false;
+
 
         // Check for errors
         if($response === FALSE){
-            die(curl_error($ch));
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield", null, $response);
         }
 
         // Decode the response
