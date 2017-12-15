@@ -83,11 +83,16 @@ class LoginService extends BaseService
 
         // Check for errors
         if($response === FALSE){
-            die(curl_error($ch));
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield: " . curl_error($ch));
         }
 
         // Decode the response
         $responseData = json_decode($response, TRUE);
+
+        if (!array_key_exists("refresh_token", $responseData) || !array_key_exists("access_token", $responseData)) {
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield: " . json_encode($responseData));
+        }
+
         $refreshToken = $responseData['refresh_token'];
         $accessToken = $responseData['access_token'];
 
@@ -112,7 +117,7 @@ class LoginService extends BaseService
 
         // Check for errors
         if($response === FALSE){
-            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield");
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield: " . curl_error($ch));
         }
 
         // Decode the response
