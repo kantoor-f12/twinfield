@@ -95,7 +95,7 @@ class LoginService extends BaseService
     }
 
     public function getClusterAndExpire(string $accessToken): array {
-        $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation";
+        $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidationzzz";
 
         // Setup cURL
         $ch = curl_init("$url?token=$accessToken");
@@ -108,13 +108,12 @@ class LoginService extends BaseService
         ));
 
         // Send the request
-//        $response = curl_exec($ch);
-        $response = false;
-
+        $response = curl_exec($ch);
 
         // Check for errors
         if($response === FALSE){
-            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield", null, $response);
+            var_dump($response);
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield");
         }
 
         // Decode the response
