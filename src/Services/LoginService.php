@@ -98,7 +98,7 @@ class LoginService extends BaseService
         $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation";
 
         // Setup cURL
-        $ch = curl_init("$url?token=Z$accessToken");
+        $ch = curl_init("$url?token=$accessToken");
         curl_setopt_array($ch, array(
             CURLOPT_POST => FALSE,
             CURLOPT_RETURNTRANSFER => TRUE,
