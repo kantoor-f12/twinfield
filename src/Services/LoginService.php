@@ -109,12 +109,9 @@ class LoginService extends BaseService
 
         // Send the request
         $response = curl_exec($ch);
-        var_dump($response);
-
 
         // Check for errors
         if($response === FALSE){
-            var_dump($response);
             throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield");
         }
 
@@ -123,6 +120,10 @@ class LoginService extends BaseService
 
         $cluster = $responseData['twf.clusterUrl'];
         $expire = $responseData['exp'];
+
+        if ($cluster === null || $expire === null) {
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield", 1, $responseData);
+        }
 
         return [$cluster, $expire];
     }
