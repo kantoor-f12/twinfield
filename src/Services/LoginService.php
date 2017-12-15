@@ -109,6 +109,8 @@ class LoginService extends BaseService
 
         // Send the request
         $response = curl_exec($ch);
+        var_dump($response);
+
 
         // Check for errors
         if($response === FALSE){
