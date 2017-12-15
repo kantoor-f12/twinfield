@@ -2,8 +2,8 @@
 
 namespace PhpTwinfield\Services;
 
-use Exception\AuthenticationException;
 use PhpTwinfield\Exception;
+use PhpTwinfield\Exceptions\AuthenticationException;
 use PhpTwinfield\Secure\Config;
 
 class LoginService extends BaseService

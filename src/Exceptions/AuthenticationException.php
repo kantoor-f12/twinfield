@@ -6,7 +6,7 @@
  * Time: 10:33
  */
 
-namespace Exception;
+namespace PhpTwinfield\Exceptions;
 
 class AuthenticationException extends \Exception
 {
