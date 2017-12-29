@@ -108,22 +108,27 @@ class Login
      */
     protected function login()
     {
-        if ($this->config->isLegacyMode()) {
+        if ($this->config->getAuthMode() === "SESSION" || $this->config->getAuthMode() === "OAUTH1") {
             if ($this->sessionID) {
                 return;
             }
 
             [$this->sessionID, $this->cluster] = $this->loginService->getSessionIdAndCluster($this->config);
-        }else {
+        } else {
             // If accessToken is still valid, don't try to retrieve it.
             if ($this->expire && time() <= $this->expire) {
                 return;
             }
 
-            // Retrieve refresh, accessToken, cluster and expiry timestamp.
-            [$this->refreshToken, $this->accessToken] = $this->loginService->getRefreshAndAccessToken($this->config);
-            [$this->cluster, $this->expire] = $this->loginService->getClusterAndExpire($this->accessToken);
+            if ($this->config->getAuthMode() === "OPENID_DIRECT") {
+                // Retrieve refresh, accessToken, cluster and expiry timestamp.
+                [$this->refreshToken, $this->accessToken] = $this->loginService->getRefreshAndAccessTokenWithOpenIdDirectConnect($this->config);
+                [$this->cluster, $this->expire] = $this->loginService->getClusterAndExpireWithOpenIdDirectConnect($this->accessToken);
+            } else if ($this->config->getAuthMode() === "AUTH_SERVER") {
+                [$this->refreshToken, $this->accessToken, $this->expire, $this->cluster] = $this->loginService->refreshTokenPairWithAuthServer($this->config);
+            }
         }
+
     }
 
     /**
@@ -165,7 +170,7 @@ class Login
                         ['SessionID' => $this->sessionID]
                     )
                 );
-            }else {
+            } else {
                 $this->authenticatedClients[$key]->__setSoapHeaders(
                     new \SoapHeader(
                         'http://www.twinfield.com/',

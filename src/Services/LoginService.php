@@ -56,7 +56,7 @@ class LoginService extends BaseService
      * @throws Exception
      * @return string[]
      */
-    public function getRefreshAndAccessToken(Config $config): array
+    public function getRefreshAndAccessTokenWithOpenIdDirectConnect(Config $config): array
     {
         $configClientId = $config->getOpenIdDirectConnectCredentials()['clientId'];
         $configClientSecret = $config->getOpenIdDirectConnectCredentials()['clientSecret'];
@@ -99,7 +99,7 @@ class LoginService extends BaseService
         return [$refreshToken, $accessToken];
     }
 
-    public function getClusterAndExpire(string $accessToken): array {
+    public function getClusterAndExpireWithOpenIdDirectConnect(string $accessToken): array {
         $url = "https://login.twinfield.com/auth/authentication/connect/accesstokenvalidation";
 
         // Setup cURL
@@ -131,6 +131,69 @@ class LoginService extends BaseService
         $expire = $responseData['exp'];
 
         return [$cluster, $expire];
+    }
+
+    /**
+     * @param Config $config
+     *
+     * @return array
+     * @throws AuthenticationException
+     */
+    public function refreshTokenPairWithAuthServer(Config $config): array
+    {
+        $configRefreshToken = $config->getAuthServerCredentials()['refreshToken'];
+        $url = $config->getAuthServerCredentials()['baseUrl'] + '/tokenPair/provider/refreshToken/twinfield?origin=genifer';
+
+        $requesterOrigin = $this->getGeniferToken()->getData('origin');
+
+        if ($this->authService->isAuthServerTokenExpired($requesterOrigin)) {
+            $this->authService->refreshAuthServerToken($requesterOrigin);
+        }
+
+        $authServerToken = $this->authService->retrieveAuthServerToken($requesterOrigin);
+
+        // Setup cURL
+        $ch = curl_init("$url");
+        curl_setopt_array($ch, array(
+            CURLOPT_POST => TRUE,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_HTTPHEADER => array(
+                "refresh-token: $configRefreshToken",
+                "auth-server-token: => $authServerToken"
+            )
+        ));
+
+        // Send the request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if($response === FALSE){
+            throw new AuthenticationException("Something went wrong while retrieving tokenPair information from Twinfield: " . curl_error($ch));
+        }
+
+        // Decode the response
+        $responseData = json_decode($response, TRUE);
+
+        if (!array_key_exists("twf.clusterUrl", $responseData) || !array_key_exists("exp", $responseData)) {
+            throw new AuthenticationException("Something went wrong while retrieving the Cluster and AccessToken expire time from Twinfield: " . json_encode($responseData));
+        }
+
+        $credentials = $responseData;
+
+        $refreshToken = $credentials['refreshToken'];
+        $accessToken = $credentials['accessToken'];
+        $expire = $credentials['expire'];
+        $cluster = $credentials['cluster'];
+
+        // Update the credentials in the Redis Store.
+        $this->authService->processCredentials($this->getGeniferToken(), $credentials, function () {
+            if (is_callable($this->tokenUpdateCallback)) {
+                call_user_func($this->tokenUpdateCallback, $this);
+            }
+        }, function () {
+            throw new ClientException("Failed to store credentials in Redis");
+        });
+
     }
 
     protected function WSDL(): string

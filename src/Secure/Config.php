@@ -29,6 +29,13 @@ final class Config
     public $cluster;
 
     /**
+     * Determines what authentication mode is being used, SESSION by default
+     *
+     * @var string
+     */
+    private $authMode = "SESSION"; // SESSION, OAUTH1, OPENID_DIRECT, AUTH_SERVER
+
+    /**
      * Holds all the login details for this
      * config object
      *
@@ -68,12 +75,11 @@ final class Config
         'accessToken' => '',
     );
 
-    /**
-     * Determines whether to use the built in login functionality or our own
-     *
-     * @var bool
-     */
-    private $legacyMode = true;
+    private $authServerCredentials = array(
+        'baseUrl' => '',
+        'refreshToken' => '',
+        'geniferToken' => ''
+    );
 
     /**
      * Holds all the OAuth class
@@ -111,6 +117,8 @@ final class Config
         $this->oauthCredentials['autoRedirect'] = $autoRedirect;
         $this->oauthCredentials['clearSession'] = $clearSession;
         $this->setOrganisationAndOffice($org, $office);
+
+        $this->authMode = "OAUTH1";
     }
 
     public function setOpenIdDirectConnectCredentials($clientId, $clientSecret, $refreshToken, $accessToken, $organisation, $office) {
@@ -121,7 +129,16 @@ final class Config
         $this->setOrganisationAndOffice($organisation, $office);
 
         // Use our own login implementation instead of the deprecated built-in session sign-on and oauth1.
-        $this->legacyMode = false;
+        $this->authMode = "OPENID_DIRECT";
+    }
+
+    public function setAuthServerCredentials($baseUrl, $refreshToken, $geniferToken) {
+        $this->authServerCredentials['baseUrl'] = $baseUrl;
+        $this->authServerCredentials['refreshToken'] = $refreshToken;
+        $this->authServerCredentials['geniferToken'] = $geniferToken;
+
+        // Use our own login implementation instead of the deprecated built-in session sign-on and oauth1.
+        $this->authMode = "AUTH_SERVER";
     }
 
     public function getOpenIdDirectConnectCredentials() {
@@ -163,6 +180,8 @@ final class Config
         $this->credentials['user']         = $username;
         $this->credentials['password']     = $password;
         $this->setOrganisationAndOffice($organisation, $office);
+
+        $this->authMode = "SESSION";
     }
 
     /**
@@ -296,9 +315,20 @@ final class Config
         return $this->soapClientOptions;
     }
 
+    /**
+     * @return string
+     */
+    public function getAuthMode(): string
+    {
+        return $this->authMode;
+    }
 
-    public function isLegacyMode() {
-        return $this->legacyMode;
+    /**
+     * @return array
+     */
+    public function getAuthServerCredentials(): array
+    {
+        return $this->authServerCredentials;
     }
 
     /**
